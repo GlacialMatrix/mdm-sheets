@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MDM - M&P</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#e9edf2}
+body{font-family:"Times New Roman",serif;color:#000}
+.toolbar{width:100%;max-width:1450px;margin:10px auto 6px;display:flex;justify-content:flex-end;gap:6px}
+.toolbar button{font:700 12px Arial,sans-serif;padding:6px 10px;border:1px solid #888;background:#fff;border-radius:4px;cursor:pointer}
+.sheet{width:100%;max-width:1450px;margin:0 auto;background:#fff;padding:0;overflow:hidden}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+col.c1{width:6.5%} col.c2{width:14.5%} col.c3{width:8.25%} col.c4{width:7.75%}
+col.c5{width:10.5%} col.c6{width:9.13%} col.c7{width:10.63%} col.c8{width:10.25%}
+col.c9{width:9.88%} col.c10{width:10.13%} col.c11{width:8.88%} col.c12{width:9.75%}
+col.c13{width:9.38%} col.c14{width:10.38%} col.c15{width:9.63%} col.c16{width:10.63%}
+td{border:1px solid #777;height:16px;padding:1px 2px;text-align:center;vertical-align:middle;overflow:hidden}
+.title{height:30px!important;background:#c9daf8;font-family:Arial,sans-serif;font-size:15px;font-weight:700;text-align:center}
+.blue{background:#c9daf8;font-family:"Times New Roman",serif;font-size:12px;font-weight:700}
+.gray{background:#d9d9d9;font-size:12px;font-weight:700}
+.red{background:#f4cccc;font-size:19px;font-weight:700}
+.sub{font-weight:700}
+.price{height:16px;background:#efefef;font-size:13px;font-weight:700}
+.data{font-size:11px}
+.totalrow{height:25px;font-size:13px;font-weight:700}
+.footer{height:49px!important;font-size:13px;vertical-align:bottom;white-space:pre}
+input{font-family:inherit;color:#000}.month-title{font-weight:700!important;text-align:center!important;font-family:Arial,sans-serif!important}
+.edit{width:100%;height:100%;border:0;background:transparent;outline:0;text-align:center;font:inherit;padding:0}
+.edit:focus{background:#fff8cf;outline:1px solid #777;outline-offset:-1px}
+.calc{font-variant-numeric:tabular-nums}
+
+@media(max-width:700px){
+ body{background:#fff}
+ .toolbar{max-width:none;margin:6px;padding:0;justify-content:center;flex-wrap:wrap}
+ .toolbar button{font-size:11px;padding:7px 10px}
+ .sheet{width:100%;margin:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .sheet table{min-width:1050px}
+ .bottom-controls{margin-bottom:6px}
+ .month-title{font-size:14px!important}
+}
+@media print{
+ input[type="date"]{
+   -webkit-appearance:none!important;
+   appearance:none!important;
+   background:transparent!important;
+ }
+ input[type="date"]::-webkit-calendar-picker-indicator{
+   display:none!important;
+   width:0!important;
+   height:0!important;
+   opacity:0!important;
+   -webkit-appearance:none!important;
+ }
+ input[type="date"]::-webkit-inner-spin-button,
+ input[type="date"]::-webkit-clear-button{
+   display:none!important;
+   -webkit-appearance:none!important;
+ }
+
+ .row-controls{display:none!important}
+ @page{size:A4 landscape;margin:5mm}
+ html,body{background:#fff}
+ .toolbar{display:none}
+ .sheet{max-width:none;width:100%}
+ td{padding:0.5px 1px}
+ .title{height:26px!important;font-size:13px;font-weight:700;text-align:center}.month-title{font-weight:700!important;text-align:center!important}
+ .blue{font-size:10px}.gray{font-size:10px}.red{font-size:14px}.price{font-size:10px}
+ .data{font-size:8px}.totalrow{height:20px;font-size:9px}.footer{height:38px!important;font-size:9px}
+ input.edit{font-size:inherit}
+ input[type=date]::-webkit-calendar-picker-indicator{display:none!important}
+}
+</style>
+</head>
+<body>
+<div class="toolbar row-controls">
+<button onclick="addBlankRow()">＋ Add Row</button>
+<button onclick="removeRow()">− Remove Row</button>
+<button onclick="window.print()">Print</button>
+</div>
+<div class="sheet">
+<table>
+<colgroup>
+<col class="c1"><col class="c2"><col class="c3"><col class="c4"><col class="c5"><col class="c6"><col class="c7"><col class="c8">
+<col class="c9"><col class="c10"><col class="c11"><col class="c12"><col class="c13"><col class="c14"><col class="c15"><col class="c16">
+</colgroup>
+<tbody>
+<tr><td colspan="16" class="title"><input id="month" class="edit month-title" type="text" value="August - 2026" aria-label="Month and Year"></td></tr>
+<tr>
+<td rowspan="2" class="blue">Sr. No</td>
+<td rowspan="2" class="blue">Date of Working Days</td>
+<td colspan="2" class="gray">Students Covered</td>
+<td colspan="2" class="blue">Rice Consumed</td>
+<td colspan="2" class="blue">Vegetables &amp; Pulses</td>
+<td colspan="2" class="blue">Oil &amp; Fat</td>
+<td colspan="2" class="blue">Spices &amp; Condiments</td>
+<td colspan="2" class="blue">L.P.G/ Firewood</td>
+<td colspan="2" class="red">Total</td>
+</tr>
+<tr>
+<td class="gray sub">Middle</td><td class="gray sub">Primary</td>
+<td class="blue sub">Middle</td><td class="blue sub">Primary</td>
+<td class="blue sub">Middle</td><td class="blue sub">Primary</td>
+<td class="blue sub">Middle</td><td class="blue sub">Primary</td>
+<td class="blue sub">Middle</td><td class="blue sub">Primary</td>
+<td class="blue sub">Middle</td><td class="blue sub">Primary</td>
+<td class="red sub">Middle</td><td class="red sub">Primary</td>
+</tr>
+<tr>
+<td></td><td></td><td colspan="2" class="price">Price ➤</td>
+<td class="price"><input id="rE" class="edit" value="0.15"></td><td class="price"><input id="rF" class="edit" value="0.10"></td>
+<td class="price"><input id="rG" class="edit" value="5.97"></td><td class="price"><input id="rH" class="edit" value="4.13"></td>
+<td class="price"><input id="rI" class="edit" value="1.50"></td><td class="price"><input id="rJ" class="edit" value="0.80"></td>
+<td class="price"><input id="rK" class="edit" value="0.90"></td><td class="price"><input id="rL" class="edit" value="0.75"></td>
+<td class="price"><input id="rM" class="edit" value="1.80"></td><td class="price"><input id="rN" class="edit" value="1.10"></td>
+<td class="price"><input id="rO" class="edit" value="10.17"></td><td class="price"><input id="rP" class="edit" value="6.78"></td>
+</tr>
+<tbody id="days"></tbody>
+<tr class="totalrow">
+<td></td><td>TOTAL</td><td id="tc">0</td><td id="td">0</td>
+<td id="te">0.000</td><td id="tf">0.000</td><td id="tg">0.000</td><td id="th">0.000</td>
+<td id="ti">0.000</td><td id="tj">0.000</td><td id="tk">0.000</td><td id="tl">0.000</td>
+<td id="tm">0.000</td><td id="tn">0.000</td><td id="to">0.000</td><td id="tp">0.000</td>
+</tr>
+
+</tbody>
+</table>
+</div>
+<div class="toolbar row-controls bottom-controls">
+<button onclick="addBlankRow()">＋ Add Row</button>
+<button onclick="removeRow()">− Remove Row</button>
+</div>
+<script>
+const days=document.getElementById("days");
+
+function renumberRows(){
+ [...days.children].forEach((tr,i)=>tr.children[0].textContent=i+1);
+}
+
+function addBlankRow(){
+ const tr=document.createElement("tr");
+ tr.className="data";
+ tr.innerHTML=`<td></td><td><input class="edit" type="date"></td>
+ <td><input class="edit stu" type="number" min="0" step="1"></td><td><input class="edit stu" type="number" min="0" step="1"></td>
+ <td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td>
+ <td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td>`;
+ days.appendChild(tr);
+ tr.querySelectorAll("input").forEach(x=>x.addEventListener("input",calc));
+ renumberRows();
+ calc();
+}
+
+function removeRow(){
+ if(days.lastElementChild) days.lastElementChild.remove();
+ renumberRows();
+ calc();
+}
+
+for(let i=1;i<=26;i++) addBlankRow();
+function n(id){return Number(document.getElementById(id).value)||0}
+function f(v){return Number(v||0).toFixed(3)}
+function calc(){
+ const rates=["rE","rF","rG","rH","rI","rJ","rK","rL","rM","rN"].map(n);
+ // Rice is a consumption quantity and is NOT part of the monetary Total.
+ // Excel's totals therefore equal:
+ // Middle = Vegetables/Pulses + Oil/Fat + Spices + LPG/Firewood = 10.17
+ // Primary = Vegetables/Pulses + Oil/Fat + Spices + LPG/Firewood = 6.78
+ const middleTotalRate = rates[2]+rates[4]+rates[6]+rates[8];
+ const primaryTotalRate = rates[3]+rates[5]+rates[7]+rates[9];
+ document.getElementById("rO").value=middleTotalRate.toFixed(2);
+ document.getElementById("rP").value=primaryTotalRate.toFixed(2);
+
+ const sums=Array(10).fill(0), stu=[0,0], totals=[0,0];
+
+ [...days.children].forEach(tr=>{
+   const m=Number(tr.children[2].querySelector("input").value)||0;
+   const p=Number(tr.children[3].querySelector("input").value)||0;
+   stu[0]+=m; stu[1]+=p;
+
+   const vals=[
+     m*rates[0], p*rates[1],
+     m*rates[2], p*rates[3],
+     m*rates[4], p*rates[5],
+     m*rates[6], p*rates[7],
+     m*rates[8], p*rates[9]
+   ];
+
+   // Display all component quantities/amounts, including Rice.
+   for(let j=0;j<10;j++){
+     tr.children[4+j].textContent=f(vals[j]);
+     sums[j]+=vals[j];
+   }
+
+   // Total deliberately excludes Rice.
+   const mt=vals[2]+vals[4]+vals[6]+vals[8];
+   const pt=vals[3]+vals[5]+vals[7]+vals[9];
+   tr.children[14].textContent=f(mt);
+   tr.children[15].textContent=f(pt);
+   totals[0]+=mt; totals[1]+=pt;
+ });
+
+ document.getElementById("tc").textContent=stu[0];
+ document.getElementById("td").textContent=stu[1];
+
+ // Rice is consumption, so do not put a monetary total in the Rice footer cells.
+ document.getElementById("te").textContent="";
+ document.getElementById("tf").textContent="";
+
+ ["tg","th","ti","tj","tk","tl","tm","tn"].forEach((id,i)=>
+   document.getElementById(id).textContent=f(sums[i+2])
+ );
+
+ document.getElementById("to").textContent=f(totals[0]);
+ document.getElementById("tp").textContent=f(totals[1]);
+}
+document.querySelectorAll("#rE,#rF,#rG,#rH,#rI,#rJ,#rK,#rL,#rM,#rN,#rO,#rP").forEach(x=>x.addEventListener("input",calc));
+calc();
+</script>
+</body>
+</html>

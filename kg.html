@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MDM - KG</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:#fff}
+body{font-family:"Times New Roman",serif;color:#000}
+.toolbar{width:100%;max-width:1200px;margin:10px auto 6px;display:flex;justify-content:flex-end;gap:6px}
+.toolbar button{font:700 12px Arial,sans-serif;padding:6px 10px;border:1px solid #888;background:#fff;border-radius:4px;cursor:pointer}
+.sheet{width:100%;max-width:1200px;margin:0 auto;background:#fff;overflow:hidden}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+col.a{width:8%} col.b{width:22.5%} col.c{width:17.5%} col.d{width:11%} col.e{width:13%} col.f{width:9.8%} col.g{width:12.5%} col.h{width:11.5%} col.i{width:12.5%}
+td{border:1px solid #777;height:17px;padding:1px 2px;text-align:center;vertical-align:middle;overflow:hidden}
+.title{height:30px!important;background:#c9daf8;font-family:Arial,sans-serif;font-size:15px;font-weight:700;text-align:center}
+.head{background:#c9daf8;font-size:12px;font-weight:700}
+.price{height:17px;background:#efefef;font-size:13px;font-weight:700}
+.data{font-size:11px}
+.totalrow{height:25px;font-size:13px;font-weight:700}
+.edit{width:100%;height:100%;border:0;background:transparent;outline:0;text-align:center;font:inherit;padding:0}
+.edit:focus{background:#fff8cf;outline:1px solid #777;outline-offset:-1px}
+.calc{font-variant-numeric:tabular-nums}
+@media(max-width:700px){
+ body{background:#fff}
+ .toolbar{margin:6px;padding:0;justify-content:center;flex-wrap:wrap}
+ .sheet{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+ .sheet table{min-width:850px}
+ .toolbar button{font-size:11px;padding:7px 10px}
+}
+@media print{
+ @page{size:A4 landscape;margin:5mm}
+ html,body{background:#fff}
+ .toolbar{display:none!important}
+ .sheet{max-width:none;width:100%;overflow:visible}
+ td{padding:.5px 1px}
+ .title{height:26px!important;font-size:13px}
+ .head{font-size:10px}.price{font-size:10px}.data{font-size:8px}.totalrow{height:20px;font-size:9px}
+ input[type=date]{-webkit-appearance:none!important;appearance:none!important;background:transparent!important}
+ input[type=date]::-webkit-calendar-picker-indicator{display:none!important;width:0!important;height:0!important;opacity:0!important}
+ input[type=date]::-webkit-inner-spin-button,input[type=date]::-webkit-clear-button{display:none!important;-webkit-appearance:none!important}
+}
+</style>
+</head>
+<body>
+<div class="toolbar row-controls">
+<button onclick="addRow()">＋ Add Row</button>
+<button onclick="removeRow()">− Remove Row</button>
+<button onclick="window.print()">Print</button>
+</div>
+
+<div class="sheet">
+<table>
+<colgroup><col class="a"><col class="b"><col class="c"><col class="d"><col class="e"><col class="f"><col class="g"><col class="h"><col class="i"></colgroup>
+<tbody>
+<tr><td colspan="9" class="title"><input id="month" class="edit" value="August - 2026" aria-label="Month and Year"></td></tr>
+<tr>
+<td class="head">Sr. No</td>
+<td class="head">Date of Working Days</td>
+<td class="head">Students Covered (Pre-Primary)</td>
+<td class="head">Rice Consumed</td>
+<td class="head">Vegetables &amp; Pulses</td>
+<td class="head">Oil &amp; Fat</td>
+<td class="head">Spices &amp; Condiments</td>
+<td class="head">L.P.G/ Firewood</td>
+<td class="head">Total</td>
+</tr>
+<tr>
+<td></td><td></td><td class="price">Price ➤</td>
+<td class="price"><input id="rD" class="edit" value="0.10"></td>
+<td class="price"><input id="rE" class="edit" value="4.13"></td>
+<td class="price"><input id="rF" class="edit" value="0.80"></td>
+<td class="price"><input id="rG" class="edit" value="0.75"></td>
+<td class="price"><input id="rH" class="edit" value="1.10"></td>
+<td class="price"><input id="rI" class="edit" value="6.78"></td>
+</tr>
+<tbody id="days"></tbody>
+<tr class="totalrow">
+<td></td><td>TOTAL</td><td id="tc">0</td><td id="td"></td><td id="te">0.000</td><td id="tf">0.000</td><td id="tg">0.000</td><td id="th">0.000</td><td id="ti">0.000</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<div class="toolbar row-controls bottom-controls">
+<button onclick="addRow()">＋ Add Row</button>
+<button onclick="removeRow()">− Remove Row</button>
+</div>
+
+<script>
+const days=document.getElementById("days");
+
+function num(id){return Number(document.getElementById(id).value)||0}
+function fmt(v){return Number(v||0).toFixed(3)}
+function renumber(){[...days.children].forEach((tr,i)=>tr.children[0].textContent=i+1)}
+
+function addRow(){
+ const tr=document.createElement("tr");
+ tr.className="data";
+ tr.innerHTML=`<td></td><td><input class="edit" type="date"></td>
+ <td><input class="edit stu" type="number" min="0" step="1"></td>
+ <td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td><td class="calc"></td>`;
+ days.appendChild(tr);
+ tr.querySelectorAll("input").forEach(x=>x.addEventListener("input",calc));
+ renumber();calc();
+}
+function removeRow(){
+ if(days.lastElementChild)days.lastElementChild.remove();
+ renumber();calc();
+}
+function calc(){
+ const rice=num("rD"), veg=num("rE"), oil=num("rF"), spice=num("rG"), lpg=num("rH");
+ const totalRate=veg+oil+spice+lpg;
+ document.getElementById("rI").value=totalRate.toFixed(2);
+ let students=0, sums=[0,0,0,0], total=0;
+ [...days.children].forEach(tr=>{
+   const n=Number(tr.querySelector(".stu").value)||0;
+   students+=n;
+   const vals=[n*rice,n*veg,n*oil,n*spice,n*lpg];
+   vals.forEach((v,i)=>tr.children[3+i].textContent=fmt(v));
+   const t=vals[1]+vals[2]+vals[3]+vals[4];
+   tr.children[8].textContent=fmt(t);
+   sums[0]+=vals[1];sums[1]+=vals[2];sums[2]+=vals[3];sums[3]+=vals[4];total+=t;
+ });
+ document.getElementById("tc").textContent=students;
+ document.getElementById("td").textContent="";
+ document.getElementById("te").textContent=fmt(sums[0]);
+ document.getElementById("tf").textContent=fmt(sums[1]);
+ document.getElementById("tg").textContent=fmt(sums[2]);
+ document.getElementById("th").textContent=fmt(sums[3]);
+ document.getElementById("ti").textContent=fmt(total);
+}
+["rD","rE","rF","rG","rH"].forEach(id=>document.getElementById(id).addEventListener("input",calc));
+calc();
+for(let i=0;i<26;i++)addRow();
+</script>
+</body>
+</html>
